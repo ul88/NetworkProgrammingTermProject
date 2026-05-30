@@ -1,0 +1,58 @@
+[
+    {
+        "index" : 0,
+        "name" : "탄산음료",
+        "cost" : 750,
+        "count" : 8,
+        "imagePath": "qrc:/drink/cider.png"
+    },
+    {
+        "index" : 1,
+        "name" : "이온음료",
+        "cost" : 550,
+        "count" : 8,
+        "imagePath": "qrc:/drink/sport_drink.png"
+    },
+    {
+        "index" : 2,
+        "name" : "믹스커피",
+        "cost" : 200,
+        "count" : 8,
+        "imagePath": "qrc:/drink/coffee.png"
+    },
+    {
+        "index" : 3,
+        "name" : "고급믹스커피",
+        "cost" : "300",
+        "count" : 8,
+        "imagePath" : "qrc:/drink/luxury_coffee.png"
+    },
+    {
+        "index" : 4,
+        "name" : "캔커피",
+        "cost" : 500,
+        "count" : 8,
+        "imagePath" : "qrc:/drink/can_coffee.png"
+    },
+    {
+        "index"  : 5,
+        "name" : "물",
+        "cost" : 450,
+        "count" : 8,
+        "imagePath" : "qrc:/drink/water.png"
+    },
+    {
+        "index" : 6,
+        "name" : "고급캔커피",
+        "cost" : 700,
+        "count" : 8,
+        "imagePath" : "qrc:/drink/luxury_can_coffee.png"
+    },
+    {
+        "index" : 7,
+        "name" : "특화음료",
+        "cost" : 800,
+        "count" : 8,
+        "imagePath" : "qrc:/drink/special_drink.png"
+    }
+]

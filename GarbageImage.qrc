@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/10won.png</file>
+        <file>images/50won.png</file>
+        <file>images/100won.png</file>
+        <file>images/500won.png</file>
+        <file>images/1000won.png</file>
+        <file>json/beverage_data.json</file>
+        <file>drink/can_coffee.png</file>
+        <file>drink/cider.png</file>
+        <file>drink/coffee.png</file>
+        <file>drink/luxury_can_coffee.png</file>
+        <file>drink/luxury_coffee.png</file>
+        <file>drink/special_drink.png</file>
+        <file>drink/sport_drink.png</file>
+        <file>drink/water.png</file>
+    </qresource>
+</RCC>
