@@ -28,6 +28,10 @@ public:
     Q_INVOKABLE void spendMoney(Money* money){
         money->setCount(money->count() - 1);
     }
+
+    Q_INVOKABLE void addMoney(Money* money){
+        money->setCount(money->count() + 1);
+    }
 private:
     QVector<QSharedPointer<Money>> moneyList;
 };

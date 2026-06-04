@@ -1,5 +1,6 @@
 import QtQuick
 import vending_machine
+import QtQuick.Controls
 Item {
     id: root
     width: 480
@@ -52,10 +53,10 @@ Item {
                     onClicked: {
                         if(money.count <= 0) return
                         if(object !== null && object.isRunningAnimate) return
-                        nowWonImagePath = money.imagePath
-                        if(object === null){
-                            object = moneyComponent.createObject(root.mainWindow, {money : money})
+                        if(object !== null){
+                            object.destroy()
                         }
+                        object = moneyComponent.createObject(root.mainWindow, {money : money})
                     }
                 }
             }
@@ -70,14 +71,25 @@ Item {
             height: 100
             clip: true
 
-            property bool isPaper: nowWonImagePath === Consumer.get(0).imagePath ? true : false
             property var money: null
             property bool isRunningAnimate: false
             property alias imageObj: image
+            property bool isPaper: money.imagePath === Consumer.get(0).imagePath ? true : false
 
             function deleteObject(){
                 Consumer.spendMoney(money)
-                VendingMachine.addConsumerMoney(money.cost)
+                let ret = VendingMachine.addConsumerMoney(money.cost)
+                switch(ret){
+                case VendingMachine.FAIL_7000:
+                    dialog.text = "7000원 이상 금액은 투입할 수 없습니다."
+                    dialog.open()
+                    break
+                case VendingMachine.FAIL_5000:
+                    dialog.text = "지폐는 5장까지만 투입 가능합니다."
+                    dialog.open()
+                    break
+                }
+
                 destroy()
             }
 
@@ -94,10 +106,26 @@ Item {
                 id: image
                 width: 100
                 height: 100
-                source: nowWonImagePath
+                source: imageBackground.money.imagePath
                 fillMode: Image.PreserveAspectFit
             }
         }
+    }
 
+    Dialog{
+        id: dialog
+
+        property string text: ""
+        closePolicy: Popup.NoAutoClose
+        modal: true
+        title: "투입 실패"
+        anchors.centerIn: Overlay.overlay
+        standardButtons: Dialog.Ok
+        width: 300
+        height: 150
+
+        contentItem: Text{
+            text: dialog.text
+        }
     }
 }

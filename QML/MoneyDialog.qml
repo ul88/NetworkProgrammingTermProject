@@ -5,6 +5,7 @@ Dialog{
     id: root
 
     required property string moneyType
+    closePolicy: Popup.NoAutoClose
 
     modal: true
     title: moneyType + " 삽입 여부"

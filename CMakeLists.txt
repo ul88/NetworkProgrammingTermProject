@@ -32,6 +32,10 @@ qt_add_qml_module(appvending_machine
         SOURCES linkedlist.h
         SOURCES consumer.h consumer.cpp
         SOURCES money.h money.cpp
+        SOURCES manager.h manager.cpp
+        SOURCES ErrorHandler.h
+        SOURCES Csv.h
+        SOURCES FileUtil.h
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

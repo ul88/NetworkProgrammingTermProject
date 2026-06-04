@@ -45,7 +45,7 @@ Rectangle {
         id: returnDialog
 
         property string text
-
+        closePolicy: Popup.NoAutoClose
         modal: true
         title: "수거되는 돈"
         anchors.centerIn: Overlay.overlay

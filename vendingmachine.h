@@ -15,6 +15,8 @@
 #include "linkedlist.h"
 #include "beverage.h"
 #include "consumer.h"
+#include "csv.h"
+#include <QDateTime>
 
 class VendingMachine : public QObject
 {
@@ -28,10 +30,15 @@ class VendingMachine : public QObject
 public:
 
     enum SuccessType{
-        PERFECT,
         SUCCESS,
+        FAIL_7000,
+        FAIL_5000,
+        FAIL_EMPTY,
+        FAIL_SOLD_OUT,
+        FAIL_INCORRECT_COST,
         FAIL
     };
+    Q_ENUM(SuccessType)
 
     explicit VendingMachine(QObject *parent = nullptr);
 
@@ -113,6 +120,7 @@ signals:
     void nowInputMoneyChanged();
     void stackTopChanged();
 private:
+    Csv logCsv;
     LinkedList<QSharedPointer<Beverage>> beverageList;
     QStack<QSharedPointer<Beverage>> outputBeverageStack;
     QVector<QSharedPointer<Money>> vmMoneyList;
@@ -138,6 +146,8 @@ private:
     void copyToMoneyList(const QVector<QSharedPointer<Money>>& to, QVector<QSharedPointer<Money>>& from);
 
     void addOutputBeverage(Beverage* beverage);
+
+    void returnAsMoney();
 };
 
 #endif // VENDINGMACHINE_H

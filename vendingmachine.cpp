@@ -4,6 +4,10 @@ VendingMachine::VendingMachine(QObject *parent)
     : QObject{parent},
     vmMoneyList{Money::makeMoneyVector()}
 {
+    if(logCsv.isFileEmpty()){
+        logCsv.setCsvHeader({"날짜", "음료명", "음료가격", "남은개수"});
+    }
+
     auto array = openJson(":/json/vm_beverage_data.json");
     if(array.empty()) {
         qWarning() << "오류 발생 종료";
@@ -90,9 +94,24 @@ Beverage* VendingMachine::getBeverage(int index){
 
 VendingMachine::SuccessType VendingMachine::addConsumerMoney(int cost){
     if(consumerMoneyList.empty()) consumerMoneyList = Money::makeMoneyVector();
-    if(m_nowInputMoney > 7000) return SuccessType::FAIL;
+    if(m_nowInputMoney >= 7000) {
+        if(returnMoneyList.empty()) returnMoneyList = Money::makeMoneyVector();
+        for(auto& iter : returnMoneyList){
+            if(iter->cost() == cost) iter->setCount(iter->count() + 1);
+        }
+        emit isReturnMoneyChanged();
+        return SuccessType::FAIL_7000;
+    }
     if(cost == 1000 && consumerMoneyList[0]->cost() == cost &&
-        consumerMoneyList[0]->count() >= 5) return SuccessType::FAIL;
+        consumerMoneyList[0]->count() >= 5) {
+        if(returnMoneyList.empty()) returnMoneyList = Money::makeMoneyVector();
+        for(auto& iter : returnMoneyList){
+            if(iter->cost() == cost) iter->setCount(iter->count() + 1);
+        }
+        emit isReturnMoneyChanged();
+        return SuccessType::FAIL_5000;
+    }
+
     for(auto iter : consumerMoneyList){
         if(iter->cost() == cost){
             iter->setCount(iter->count() + 1);
@@ -100,43 +119,54 @@ VendingMachine::SuccessType VendingMachine::addConsumerMoney(int cost){
             return SuccessType::SUCCESS;
         }
     }
+
+    return SuccessType::FAIL;
 }
 
 VendingMachine::SuccessType VendingMachine::buyBeverage(Beverage* beverage){
-    if(consumerMoneyList.empty()) return SuccessType::FAIL;
-    if(m_nowInputMoney == 0) return SuccessType::FAIL;
-    if(beverage->count() <= 0) return SuccessType::FAIL;
+    if(beverage->count() <= 0) return FAIL_SOLD_OUT;
+    if(consumerMoneyList.empty()) return FAIL_EMPTY;
+    if(m_nowInputMoney == 0) return FAIL_EMPTY;
     if(beverage->cost() == m_nowInputMoney){
         consumerMoneyList.clear();
         addOutputBeverage(beverage);
         setNowInputMoney(0);
-        return SuccessType::PERFECT;
+        //로그 파일에 저장
+        logCsv.write({QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"),
+                      beverage->name(),
+                      QString::number(beverage->cost()),
+                      QString::number(beverage->count())});
+        return SUCCESS;
     }
-
 
     if(beverage->cost() < m_nowInputMoney){
         if(calcuateReturnMoney(m_nowInputMoney - beverage->cost())) {
             addOutputBeverage(beverage);
             setNowInputMoney(0);
-            return SuccessType::SUCCESS;
+
+            //로그 파일에 저장
+            logCsv.write({QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss"),
+                          beverage->name(),
+                          QString::number(beverage->cost()),
+                          QString::number(beverage->count())});
+            return SUCCESS;
         }
     }
 
-    if(!returnMoneyList.empty()) {
-        qWarning()<<"returnMoneyList가 비어있지 않으면 안됩니다. 오류 확인 필요";
-        return SuccessType::FAIL;
-    }
+    returnAsMoney();
+    return FAIL_INCORRECT_COST;
+}
 
-    returnMoneyList = Money::makeMoneyVector();
+void VendingMachine::returnAsMoney(){
+    if(returnMoneyList.empty()) returnMoneyList = Money::makeMoneyVector();
     copyToMoneyList(consumerMoneyList, returnMoneyList);
     consumerMoneyList.clear();
     setNowInputMoney(0);
     emit isReturnMoneyChanged();
-    return SuccessType::FAIL;
 }
 
 bool VendingMachine::calcuateReturnMoney(int remainedCost){
-    returnMoneyList = Money::makeMoneyVector();
+    auto temp = Money::makeMoneyVector();
     for(int i=0;i<vmMoneyList.size();i++){
         if(vmMoneyList[i]->cost() != consumerMoneyList[i]->cost()){
             qWarning() << "두 MoneyList의 Money 순서가 다릅니다.";
@@ -148,15 +178,19 @@ bool VendingMachine::calcuateReturnMoney(int remainedCost){
                          ? nowVMMoneyCount : remainedCost / vmMoneyList[i]->cost());
 
         remainedCost -= vmMoneyList[i]->cost() * count;
-        returnMoneyList[i]->setCount(count);
+        temp[i]->setCount(count);
     }
 
     if(remainedCost == 0){
+        if(returnMoneyList.empty()) returnMoneyList = Money::makeMoneyVector();
+        for(int i=0;i<temp.size();i++){
+            returnMoneyList[i]->setCount(returnMoneyList[i]->count() + temp[i]->count());
+        }
         addVMMoney();
+        consumerMoneyList.clear();
         emit isReturnMoneyChanged();
         return true;
     }else{
-        returnMoneyList.clear();
         return false;
     }
 }
