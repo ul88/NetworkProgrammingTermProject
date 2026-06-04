@@ -1,5 +1,5 @@
 import QtQuick
-
+import vending_machine
 Item {
     id: root
     width: 480
@@ -7,13 +7,6 @@ Item {
     required property Window mainWindow
     required property real mouseX
     required property real mouseY
-    required property var won
-    property var wonType: [1000, 500, 100, 50, 10]
-    property var wonImagePath: ["qrc:/images/1000won.png",
-                                "qrc:/images/500won.png",
-                                "qrc:/images/100won.png",
-                                "qrc:/images/50won.png",
-                                "qrc:/images/10won.png"]
     property var object: null
     property string nowWonImagePath
 
@@ -35,14 +28,14 @@ Item {
             Rectangle {
                 width: parent.blockWidth
                 height: parent.height
-
+                property var money: Consumer.get(index)
                 Text {
                     id: label
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     leftPadding: 5
 
-                    text: wonType[index] + "원 : "
+                    text: money.cost + "원 : "
                 }
 
                 Text {
@@ -50,18 +43,18 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     rightPadding: 5
 
-                    text: won[index]
+                    text: money.count
                 }
 
                 MouseArea{
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
-                        if(won[index] <= 0) return
+                        if(money.count <= 0) return
                         if(object !== null && object.isRunningAnimate) return
-                        nowWonImagePath = wonImagePath[index]
+                        nowWonImagePath = money.imagePath
                         if(object === null){
-                            object = moneyComponent.createObject(root.mainWindow, {won : won[index]})
+                            object = moneyComponent.createObject(root.mainWindow, {money : money})
                         }
                     }
                 }
@@ -77,12 +70,14 @@ Item {
             height: 100
             clip: true
 
-            property bool isPaper: nowWonImagePath == "qrc:/images/1000won.png" ? true : false
-            property int won: 0
+            property bool isPaper: nowWonImagePath === Consumer.get(0).imagePath ? true : false
+            property var money: null
             property bool isRunningAnimate: false
             property alias imageObj: image
 
             function deleteObject(){
+                Consumer.spendMoney(money)
+                VendingMachine.addConsumerMoney(money.cost)
                 destroy()
             }
 

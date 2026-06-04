@@ -17,12 +17,12 @@ qt_add_qml_module(appvending_machine
     URI vending_machine
     QML_FILES
         QML/Main.qml
-        QML/GarbageArea.qml
+        QML/BeverageArea.qml
         QML/PromotionBlock.qml
-        QML/GarbageRemainedCost.qml
+        QML/InputMoneyText.qml
         QML/InputPaperMoney.qml
         QML/InputCoin.qml
-        QML/GarbageOutputBlock.qml
+        QML/BeverageOutputBlock.qml
         QML/HaveMoneyArea.qml
         QML/OutputMoneyArea.qml
         RESOURCES GarbageImage.qrc
@@ -30,6 +30,8 @@ qt_add_qml_module(appvending_machine
         SOURCES vendingmachine.h vendingmachine.cpp
         SOURCES beverage.h beverage.cpp
         SOURCES linkedlist.h
+        SOURCES consumer.h consumer.cpp
+        SOURCES money.h money.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

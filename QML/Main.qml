@@ -27,10 +27,9 @@ Window {
             model: 21
             property int modelCount: 15
             z: 1
-            GarbageArea{
-                property var beverage: VendingMachine.getBeverage(index)
-                id: garbageArea
-                path: beverage ? beverage.imagePath : ""
+            delegate: BeverageArea{
+                beverage: VendingMachine.getBeverage(index)
+                id: beverageArea
                 imageWidth: 65
                 imageHeight: 65
             }
@@ -46,16 +45,16 @@ Window {
         height: 110
     }
 
-    GarbageRemainedCost {
-        id: garbageRemainedCost
+    InputMoneyText {
+        id: inputMoneyText
         x: promotionBlock.x + promotionBlock.width + 10
         y: promotionBlock.y
     }
 
     InputPaperMoney {
         id: inputPaperMoney
-        x: garbageRemainedCost.x + 5
-        y: garbageRemainedCost.y + garbageRemainedCost.height + 10
+        x: inputMoneyText.x + 5
+        y: inputMoneyText.y + inputMoneyText.height + 10
     }
 
     InputCoin {
@@ -64,8 +63,8 @@ Window {
         y: promotionBlock.y
     }
 
-    GarbageOutputBlock {
-        id: garbageOutputBlock
+    BeverageOutputBlock {
+        id: beverageOutputBlock
         x: 20
         y: 505
     }
@@ -74,7 +73,6 @@ Window {
         id: haveMoneyArea
         x: 0
         y: 610
-        won: [1, 2, 3, 4, 5]
         mainWindow: window
         mouseX: window.mouseX
         mouseY: window.mouseY
