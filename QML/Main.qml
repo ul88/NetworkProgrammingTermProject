@@ -102,6 +102,7 @@ Window {
                     beverage: VendingMachine.getBeverage(index)
                     imageWidth: 65
                     imageHeight: 65
+                    nowIndex: index
 
                     onModifyBeverage: {
                         modifyButtonRow.visible = true
@@ -131,6 +132,7 @@ Window {
                     managerFlow.reloadRepeater()
                     userFlow.reloadRepeater()
                     modifyButtonRow.visible = false
+                    moneyRepeater.moneyRepeaterReload()
                 }
             }
             Button{
@@ -142,6 +144,7 @@ Window {
                     VendingMachine.reload() // 기존 파일대로 다시 재설정하기 위함.
                     managerFlow.reloadRepeater()
                     modifyButtonRow.visible = false
+                    moneyRepeater.moneyRepeaterReload()
                 }
             }
 
@@ -157,6 +160,11 @@ Window {
             Repeater{
                 id: moneyRepeater
                 model: 5
+
+                function moneyRepeaterReload(){
+                    moneyRepeater.model = 0
+                    moneyRepeater.model = 5
+                }
 
                 delegate: Rectangle{
                     id: moneyRepeaterRectangle
@@ -182,14 +190,14 @@ Window {
                             Image{
                                 width: 35
                                 height: 35
-                                source: moneyRepeaterRectangle.money.imagePath
+                                source: moneyRepeaterRectangle.money ? moneyRepeaterRectangle.money.imagePath : ""
                                 fillMode: Image.PreserveAspectFit
                             }
 
                             Text{
                                 width: parent.width - 40
                                 height: parent.height
-                                text: moneyRepeaterRectangle.money.cost + "원"
+                                text: moneyRepeaterRectangle.money? moneyRepeaterRectangle.money.cost + "원" : ""
                                 font.pixelSize: 11
                                 font.bold: true
                                 color: "#222222"
@@ -201,7 +209,7 @@ Window {
                         Text{
                             width: parent.width
                             height: 11
-                            text: moneyRepeaterRectangle.money.count
+                            text: moneyRepeaterRectangle.money ? moneyRepeaterRectangle.money.count : ""
                             font.pixelSize: 11
                             color: "#555555"
                             horizontalAlignment: Text.AlignHCenter
@@ -223,8 +231,7 @@ Window {
 
             onClicked: {
                 VendingMachine.collection()
-                moneyRepeater.model = 0
-                moneyRepeater.model = 5
+                moneyRepeater.moneyRepeaterReload()
             }
         }
 
@@ -243,28 +250,9 @@ Window {
             }
         }
 
-        Window{
+        SalesCheckWindow{
             id: salesCheckWindow
-            width: 480
-            height: 320
-            visible: false
-            title: "매출확인"
-            modality: Qt.ApplicationModal
             transientParent: window
-
-            onVisibleChanged: {
-                if(!visible) return
-
-                managerTableView.headerList = VendingMachine.getCsvHeader("collection_log")
-                managerTableView.logList = VendingMachine.getLogList("collection_log", "날짜", VendingMachine.DESC)
-            }
-
-            ManagerTableView{
-                id: managerTableView
-                anchors.fill: parent
-                logList: []
-                headerList: []
-            }
         }
     }
 

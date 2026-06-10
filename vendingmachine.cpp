@@ -389,6 +389,22 @@ void VendingMachine::changeBeverageIndex(Beverage* beverage, int newIndex){
     }
 }
 
+void VendingMachine::changeBeverageCost(Beverage* beverage, int newCost){
+    if(!Manager::getInstance().isLogined()){
+        WARNING("로그인 하지 않은 사용자는 접근할 수 없는 기능입니다.");
+        return;
+    }
+
+    for(int i=0;i<beverageList.getSize();i++){
+        auto b = beverageList.get(i);
+
+        if(b.data() == beverage){
+            beverage->setCost(newCost);
+            break;
+        }
+    }
+}
+
 void VendingMachine::changeBeverageCount(Beverage* beverage, int newCount){
     if(!Manager::getInstance().isLogined()){
         WARNING("로그인 하지 않은 사용자는 접근할 수 없는 기능입니다.");
@@ -402,6 +418,17 @@ void VendingMachine::changeBeverageCount(Beverage* beverage, int newCount){
             break;
         }
     }
+}
+
+void VendingMachine::insertNewBeverage(int index, QString name, int cost, int count, QString imagePath){
+    if(!Manager::getInstance().isLogined()){
+        WARNING("로그인 하지 않은 사용자는 접근할 수 없는 기능입니다.");
+        return;
+    }
+
+    imagePath = "file:///" + FileUtil::copyFile(imagePath, "image");
+    QSharedPointer<Beverage> beverage(new Beverage(index, name, cost, count, imagePath));
+    insertBeverageList(beverageList, beverage);
 }
 
 void VendingMachine::removeBeverage(Beverage* beverage){

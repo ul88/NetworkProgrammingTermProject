@@ -67,7 +67,7 @@ public:
     }
 
     void remove(int index){
-        if(index > m_size){
+        if(index > m_size || index < 0){
             WARNING("존재하지 않는 index: %1을 삭제하려고 했습니다.", index);
             return;
         }
@@ -76,6 +76,7 @@ public:
             auto head = node->next;
             node.clear();
             node = head;
+            m_size--;
             return;
         }
         int i = -1;
@@ -87,6 +88,7 @@ public:
             }
             prev->next = head->next;
             head.clear();
+            m_size--;
             break;
         }
     }

@@ -129,8 +129,14 @@ public slots:
     // 음료의 인덱스 즉, 출구 위치를 수정하는 함수
     void changeBeverageIndex(Beverage* beverage, int newIndex);
 
+    // 음료의 금액을 수정하는 함수
+    void changeBeverageCost(Beverage* beverage, int newCost);
+
     // 음료의 개수를 수정하는 함수
     void changeBeverageCount(Beverage* beverage, int newCount);
+
+    // 새로운 음료를 추가하는 함수
+    void insertNewBeverage(int index, QString name, int cost, int count, QString imagePath);
 
     // beverageList에서 beverage를 삭제하는 함수
     void removeBeverage(Beverage* beverage);

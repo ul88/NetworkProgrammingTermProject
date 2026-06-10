@@ -38,6 +38,8 @@ qt_add_qml_module(appvending_machine
         SOURCES FileUtil.h
         QML_FILES QML/ManagerTableView.qml
         QML_FILES QML/BeverageManagerArea.qml
+        QML_FILES QML/SalesCheckWindow.qml
+        QML_FILES QML/RevenuePeriodView.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

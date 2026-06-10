@@ -62,6 +62,59 @@ static QMap<QString, QString> copyQrcFile(QString type, QString qrcPath, QString
     return ret;
 }
 
+static QString makeUniqueFilePath(const QString& dirPath, const QString& fileName)
+{
+    QFileInfo info(fileName);
+
+    QString baseName = info.completeBaseName(); // 확장자 제외 파일명
+    QString suffix = info.suffix();             // 확장자
+    QDir dir(dirPath);
+
+    QString dstPath = dir.absoluteFilePath(fileName);
+
+    int count = 1;
+
+    while (QFile::exists(dstPath)) {
+        QString newFileName;
+
+        if (suffix.isEmpty()) {
+            newFileName = QString("%1_%2").arg(baseName).arg(count);
+        } else {
+            newFileName = QString("%1_%2.%3").arg(baseName).arg(count).arg(suffix);
+        }
+
+        dstPath = dir.absoluteFilePath(newFileName);
+        count++;
+    }
+
+    return dstPath;
+}
+
+static QString copyFile(QString path, QString folderName)
+{
+    QString targetPath = QDir(getDir()).filePath(folderName);
+
+    if (!QDir().mkpath(targetPath)) {
+        WARNING("기본 폴더 생성 실패 %1", targetPath);
+        return "";
+    }
+
+    QString fileName = QFileInfo(path).fileName();
+
+    if (fileName.isEmpty()) {
+        WARNING("파일 이름을 가져올 수 없습니다: %1", path);
+        return "";
+    }
+
+    QString dstPath = makeUniqueFilePath(targetPath, fileName);
+
+    if (!QFile::copy(path, dstPath)) {
+        WARNING("%1 파일 복사가 실패하였습니다. error path=%2", path, dstPath);
+        return "";
+    }
+
+    return dstPath;
+}
 static QMap<QString, QString> listFile(QString type, QString path){
     QDir dir(path);
     QStringList files = dir.entryList(
