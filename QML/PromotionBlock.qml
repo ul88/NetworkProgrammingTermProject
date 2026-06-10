@@ -86,7 +86,7 @@ Rectangle {
                     echoMode: TextInput.Password
 
                     onAccepted: {
-                        login(text)
+                        login(textInput.text)
                     }
                 }
             }

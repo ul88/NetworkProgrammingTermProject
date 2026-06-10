@@ -15,7 +15,7 @@ class Beverage : public QObject
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged FINAL)
     Q_PROPERTY(int cost READ cost WRITE setCost NOTIFY costChanged FINAL)
     Q_PROPERTY(int count READ count WRITE setCount NOTIFY countChanged FINAL)
-    Q_PROPERTY(QString imagePath READ imagePath CONSTANT)
+    Q_PROPERTY(QString imagePath READ imagePath WRITE setImagePath NOTIFY imagePathChanged FINAL)
 public:
     explicit Beverage();
     explicit Beverage(int index, QString name, int cost, int count, QString imagePath);
@@ -49,11 +49,18 @@ public:
         m_count = count;
         emit countChanged();
     }
+
+    void setImagePath(QString imagePath){
+        if(m_imagePath == imagePath) return;
+        m_imagePath = imagePath;
+        emit imagePathChanged();
+    }
 signals:
     void indexChanged();
     void nameChanged();
     void costChanged();
     void countChanged();
+    void imagePathChanged();
 private:
     int m_index;
     QString m_name;

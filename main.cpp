@@ -1,12 +1,15 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include "vendingmachine.h"
+#include "manager.h"
+#include <QQuickStyle>
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
+
+    QQuickStyle::setStyle("Fusion");
 
     QObject::connect(
         &engine,

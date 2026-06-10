@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QQuickItem>
 #include "money.h"
-#include <QVector>
+#include <QList>
 #include <QSharedPointer>
 
 class Consumer : public QObject
@@ -33,7 +33,7 @@ public:
         money->setCount(money->count() + 1);
     }
 private:
-    QVector<QSharedPointer<Money>> moneyList;
+    QList<QSharedPointer<Money>> moneyList;
 };
 
 #endif // CONSUMER_H

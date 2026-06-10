@@ -37,6 +37,7 @@ Window {
         onStopped: {
             mangerComponent.enabled = true
             mangerComponent.visible = true
+            userComponent.opacity = 0.7
         }
     }
 
@@ -52,6 +53,7 @@ Window {
             window.x += window.width
             userComponent.x = 0
             userComponent.enabled = true
+            userComponent.opacity = 1
         }
     }
 
@@ -65,9 +67,203 @@ Window {
 
         Button{
             id: button
-            text:"닫기"
+            width: 30
+            height: 20
+            text:"X"
+
             onClicked: {
                 managerState = false
+            }
+            x: 450
+        }
+
+        Flow {
+            id: managerFlow
+            width: parent.width - 20
+            anchors.top: parent.top
+            anchors.topMargin: 10
+            padding: 10
+            clip: false
+            layer.wrapMode: ShaderEffectSource.ClampToEdge
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            function reloadRepeater(){
+                managerRepeater.model = 0
+                managerRepeater.model = 21
+            }
+
+            Repeater {
+                id: managerRepeater
+                visible: true
+                model: 21
+                property int modelCount: 15
+                z: 1
+                delegate: BeverageManagerArea{
+                    beverage: VendingMachine.getBeverage(index)
+                    imageWidth: 65
+                    imageHeight: 65
+
+                    onModifyBeverage: {
+                        modifyButtonRow.visible = true
+                        managerFlow.reloadRepeater()
+                    }
+                }
+            }
+            spacing: 10
+        }
+
+        Row{
+            id: modifyButtonRow
+            x: 20
+            y: 355
+            spacing: 10
+            visible: false
+            property int buttonWidth: 80
+            property int buttonHeight: 35
+
+            Button{
+                width: modifyButtonRow.buttonWidth
+                height: modifyButtonRow.buttonHeight
+                text:"수정 완료"
+
+                onClicked: {
+                    VendingMachine.jsonUpdateVMBeverage()
+                    managerFlow.reloadRepeater()
+                    userFlow.reloadRepeater()
+                    modifyButtonRow.visible = false
+                }
+            }
+            Button{
+                width: modifyButtonRow.buttonWidth
+                height: modifyButtonRow.buttonHeight
+                text: "수정 취소"
+
+                onClicked: {
+                    VendingMachine.reload() // 기존 파일대로 다시 재설정하기 위함.
+                    managerFlow.reloadRepeater()
+                    modifyButtonRow.visible = false
+                }
+            }
+
+        }
+
+        Row{
+            id: managerMoneyRow
+            anchors.top: modifyButtonRow.bottom
+            anchors.topMargin: 12
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 8
+
+            Repeater{
+                id: moneyRepeater
+                model: 5
+
+                delegate: Rectangle{
+                    id: moneyRepeaterRectangle
+                    width: 84
+                    height: 62
+                    radius: 6
+                    color: "#f6f1e8"
+                    border.color: "#c8bca8"
+                    border.width: 1
+
+                    property var money: VendingMachine.getMoney(index)
+
+                    Column{
+                        anchors.fill: parent
+                        anchors.margins: 6
+                        spacing: 4
+
+                        Row{
+                            width: parent.width
+                            height: 35
+                            spacing: 5
+
+                            Image{
+                                width: 35
+                                height: 35
+                                source: moneyRepeaterRectangle.money.imagePath
+                                fillMode: Image.PreserveAspectFit
+                            }
+
+                            Text{
+                                width: parent.width - 40
+                                height: parent.height
+                                text: moneyRepeaterRectangle.money.cost + "원"
+                                font.pixelSize: 11
+                                font.bold: true
+                                color: "#222222"
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                        }
+
+                        Text{
+                            width: parent.width
+                            height: 11
+                            text: moneyRepeaterRectangle.money.count
+                            font.pixelSize: 11
+                            color: "#555555"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
+                }
+            }
+        }
+
+        Button{
+            id: collectionButton
+            anchors.top: managerMoneyRow.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.topMargin: 12
+            text: "수금하기"
+            width: 440
+            height: 30
+
+            onClicked: {
+                VendingMachine.collection()
+                moneyRepeater.model = 0
+                moneyRepeater.model = 5
+            }
+        }
+
+        Button{
+            id: salesCheckButton
+            anchors.top: collectionButton.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.topMargin: 12
+            text: "매출확인하기"
+            width: 440
+            height: 30
+
+            onClicked: {
+                salesCheckWindow.show()
+                salesCheckWindow.requestActivate()
+            }
+        }
+
+        Window{
+            id: salesCheckWindow
+            width: 480
+            height: 320
+            visible: false
+            title: "매출확인"
+            modality: Qt.ApplicationModal
+            transientParent: window
+
+            onVisibleChanged: {
+                if(!visible) return
+
+                managerTableView.headerList = VendingMachine.getCsvHeader("collection_log")
+                managerTableView.logList = VendingMachine.getLogList("collection_log", "날짜", VendingMachine.DESC)
+            }
+
+            ManagerTableView{
+                id: managerTableView
+                anchors.fill: parent
+                logList: []
+                headerList: []
             }
         }
     }
@@ -77,8 +273,14 @@ Window {
         width: 480
         height: 640
 
+        onEnabledChanged: {
+            if(enabled){
+                userFlow.reloadRepeater()
+            }
+        }
+
         Flow {
-            id: flow1
+            id: userFlow
             width: parent.width - 20
             anchors.top: parent.top
             anchors.topMargin: 10
@@ -86,12 +288,18 @@ Window {
             clip: false
             layer.wrapMode: ShaderEffectSource.ClampToEdge
             anchors.horizontalCenter: parent.horizontalCenter
+
+            function reloadRepeater(){
+                repeater.model = 0
+                repeater.model = 21
+            }
+
             Repeater {
                 id: repeater
                 visible: true
                 model: 21
-                property int modelCount: 15
                 z: 1
+                property int modelCount: 15
                 delegate: BeverageArea {
                     beverage: VendingMachine.getBeverage(index)
                     id: beverageArea
@@ -104,8 +312,8 @@ Window {
 
         PromotionBlock {
             id: promotionBlock
-            x: flow1.x + flow1.anchors.topMargin
-            y: flow1.y + flow1.height + flow1.anchors.topMargin
+            x: userFlow.x + userFlow.anchors.topMargin
+            y: userFlow.y + userFlow.height + userFlow.anchors.topMargin
             width: 180
             height: 110
             onSuccessLogin: {

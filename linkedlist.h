@@ -2,6 +2,7 @@
 #define LINKEDLIST_H
 
 #include <QSharedPointer>
+#include "ErrorHandler.h"
 #include <functional>
 
 template<typename T>
@@ -63,6 +64,31 @@ public:
         newNode->next = nullptr;
 
         insertImpl(newNode, index);
+    }
+
+    void remove(int index){
+        if(index > m_size){
+            WARNING("존재하지 않는 index: %1을 삭제하려고 했습니다.", index);
+            return;
+        }
+
+        if(index == 0){
+            auto head = node->next;
+            node.clear();
+            node = head;
+            return;
+        }
+        int i = -1;
+        QSharedPointer<NodeType> prev = nullptr;
+        for(auto head = node; head ; head = head->next){
+            if(index != ++i) {
+                prev = head;
+                continue;
+            }
+            prev->next = head->next;
+            head.clear();
+            break;
+        }
     }
 
     int getSize() const { return m_size; }

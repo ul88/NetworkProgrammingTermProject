@@ -19,6 +19,12 @@ Item {
         return wonType[i] + "원 : " + pad5(won[i])
     }
 
+    onEnabledChanged: {
+        if(enabled === false){
+            if(object !== null) object.destroy()
+        }
+    }
+
     Row{
         property int blockWidth: 90
         leftPadding: 5

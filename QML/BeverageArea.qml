@@ -9,26 +9,38 @@ Rectangle {
     property int imageWidth
     property int imageHeight
     property var beverage
+    property string imagePath: ""
+    property int cost: -1
+    property int count: -1
+
+    onBeverageChanged: {
+        if(beverage){
+            imagePath = beverage.imagePath
+            cost = beverage.cost
+            count = beverage.count
+        }
+    }
+
     Image{
         width: root.imageWidth
         height: root.imageHeight
         anchors.horizontalCenter: parent.horizontalCenter
         y:13
         fillMode: Image.PreserveAspectFit
-        source: root.beverage ? root.beverage.imagePath : ""
+        source: root.imagePath
     }
     Rectangle{
         y: 70
         width: 50
         height: 20
         anchors.horizontalCenter: parent.horizontalCenter
-        color : root.beverage ? (root.beverage.count !== 0 ? "green" : "red") : "white"
+        color : root.count >= 0 ? (root.count !== 0 ? "green" : "red") : "white"
         Text{
             anchors.fill: parent
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             font.bold: true
-            text: root.beverage ? root.beverage.cost : ""
+            text: root.cost >= 0 ? root.cost : ""
         }
 
         MouseArea{
@@ -52,6 +64,9 @@ Rectangle {
                 case VendingMachine.FAIL_INCORRECT_COST:
                     dialogStart(beverage.name + "음료의 가격 " + beverage.cost + "에 맞지 않는 금액을\n투입하였습니다.\n"
                                 + "투입한 금액 그대로 반환합니다.")
+                    break
+                case VendingMachine.FAIL_NOT_HAVE_MONEY:
+                    dialogStart("자판기에 반환해드릴 금액이 부족합니다. \n관리자를 호출하거나 정확한 금앱을 투입해주세요.")
                     break
                 default:
                     break

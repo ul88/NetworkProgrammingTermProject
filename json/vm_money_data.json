@@ -1,6 +1,4 @@
-[
-    {
-        "username" : "vending_machine",
-        "money" : [10, 10, 10, 10, 10]
-    }
-]
+{
+    "money" : [10, 10, 10, 10, 10]
+}
+

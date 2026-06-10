@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QQuickItem>
-#include <QVector>
+#include <QList>
 
 class Money : public QObject
 {
@@ -17,7 +17,7 @@ public:
     explicit Money(QString imagePath, int cost, int count, QObject* parent = nullptr);
     explicit Money(QString imagePath, int cost, QObject* parent = nullptr);
 
-    static QVector<QSharedPointer<Money>> makeMoneyVector(){
+    static QList<QSharedPointer<Money>> makeMoneyVector(){
         return {
             QSharedPointer<Money>(new Money("qrc:/images/1000won.png",1000)),
             QSharedPointer<Money>(new Money("qrc:/images/500won.png",500)),
